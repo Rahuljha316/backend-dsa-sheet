@@ -1,6 +1,7 @@
 const User = require("../models/User");
 const bcrypt = require('bcrypt')
-const jwt = require('jsonwebtoken')
+const jwt = require('jsonwebtoken');
+const { useRef } = require("react");
 const validator = require('validator')
 const generateToken = (user) => {
     return jwt.sign(
@@ -10,6 +11,39 @@ const generateToken = (user) => {
     )
 }
 
+const login = async (req, res) => {
+    const { email, password } = req.body;
+    try {
+        if (!email || !password) {
+            return res.status(400).json({
+                message: "Please fill all the fields"
+            })
+        }
+        const validEmail = validator.isEmail(email)
+        if (!validEmail) return res.status(400).json({
+            message: "Invalid email format"
+        })
+        const user = await User.findOne({ email: email });
+        if (!user) return res.status(400).json({
+            message: 'Invalid email or password'
+        });
+        const isValidPassword = await bcrypt.compare(password, user.password)
+        if (!isValidPassword) return res.status(400).json({
+            message: 'Invalid email or password'
+        });
+
+
+
+        const token = generateToken(user)
+        res.status(200).json({ user: { id: user._id, name: user.name, email: user.email }, token });
+
+    } catch (error) {
+        res.status(500).json({
+            message: error.message
+        })
+    }
+
+};
 const register = async (req, res) => {
     const { name, email, password } = req.body;
     try {
@@ -46,5 +80,6 @@ const register = async (req, res) => {
 
 
 module.exports = {
-    register
+    register,
+    login
 }
