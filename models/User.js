@@ -7,6 +7,12 @@ const UserSchema = new mongoose.Schema({
         unique: true
     },
     password: String,
+    progress: [
+        {
+            categoryId: mongoose.Schema.Types.ObjectId,
+            subtopicId: mongoose.Schema.Types.ObjectId
+        }
+    ]
 
 
 });
