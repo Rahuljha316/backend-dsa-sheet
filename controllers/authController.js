@@ -1,11 +1,10 @@
 const User = require("../models/User");
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken');
-const { useRef } = require("react");
 const validator = require('validator')
 const generateToken = (user) => {
     return jwt.sign(
-        { id: user._id, email: user.email },
+        { id: user._id, email: user.email, name: user.name },
         process.env.JWT_SECRET,
         { expiresIn: '1d' }
     )
